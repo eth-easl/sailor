@@ -1,0 +1,2 @@
+global_batch_size,time,forward-compute,backward-compute,backward-params-all-reduce,backward-embedding-all-reduce,optimizer,batch-generator
+32,2841.20,1411.34,1406.53,3.70,0.33,3.19,8.71

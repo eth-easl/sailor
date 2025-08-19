@@ -1,0 +1,2 @@
+global_batch_size,time,forward-compute,forward-recv,forward-send,forward-send-backward-recv,backward-compute,backward-recv,backward-send,backward-send-forward-recv,backward-params-all-reduce,backward-embedding-all-reduce,optimizer,batch-generator,total_mb,allocated,max_allocated,reserved,max_reserved
+64,2375.59,766.30,17.13,77.20,80.19,768.58,10.32,0.74,98.40,1.32,0.06,31.60,15.26,6550.00,411.85,3099.26,3242.00,3242.00
