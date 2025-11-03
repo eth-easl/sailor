@@ -33,9 +33,9 @@ The project is structured as follows:
 
 * Software: We use nvcr.io/nvidia/pytorch:24.10-py3 as the base image for our container
 * Hardware: We run experiments in 3 different types of clusters:
-      * the [Alps Clariden](https://docs.cscs.ch/clusters/clariden/#logging-into-clariden) cluster, containing Grace-Hopper GPU nodes.
-      * A cluster from the MIT university containing 8-Titan-RTX, 8-RTX-2080, and 8-RTX-3090.
-      * Google Cloud, where we used A100-40 GPUs, and V100-16 GPUs (with n1-standard VMs)
+     * The [Alps Clariden](https://docs.cscs.ch/clusters/clariden/#logging-into-clariden) cluster, containing Grace-Hopper GPU nodes.
+     * A cluster from the MIT university containing 8-Titan-RTX, 8-RTX-2080, and 8-RTX-3090.
+     * Google Cloud, where we used A100-40 GPUs, and V100-16 GPUs (with n1-standard VMs)
 Our simulator validation and plan generation experiments do not require a GPU
 
 ## Instructions for Artifact evaluation
@@ -47,12 +47,16 @@ Instructions for a simple functional use and reproducing key experiments from th
 
 You can build the SAILOR image with:
 
-* `git clone https://github.com/eth-easl/sailor.git`
-* `cd sailor`
-* `docker buildx build -t <image_name> .`
+```sh
+git clone https://github.com/eth-easl/sailor.git
+cd sailor
+docker buildx build -t <image_name> .
+```
 
-To build an image on the Alps cluster, follow the instructions in []()
+To build an image on the Alps cluster, follow the instructions in [create_image_alps.md](create_image_alps.md)
 
+
+## Citation
 
 If you use Sailor, please cite our paper:
 
