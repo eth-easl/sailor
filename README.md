@@ -57,16 +57,20 @@ To build an image on the Alps cluster, follow the instructions in []()
 If you use Sailor, please cite our paper:
 
 ```bibtex
-@misc{sosp2025sailor,
-      title={Sailor: Automating Distributed Training over Dynamic, Heterogeneous, and Geo-distributed Clusters},
-      author={Foteini Strati and Zhendong Zhang and George Manos and Ixeia Sánchez Périz and Qinghao Hu and Tiancheng Chen and Berk Buzcu and Song Han and Pamela Delgado and Ana Klimovic},
-      booktitle = {},
-      year = {2025},
-      isbn = {},
-      address = {},
-      pages = {},
-      url = {},
-      doi = {},
-      publisher = {Association for Computing Machinery},
+@inproceedings{10.1145/3731569.3764839,
+     author = {Strati, Foteini and Zhang, Zhendong and Manos, George and P\'{e}riz, Ixeia S\'{a}nchez and Hu, Qinghao and Chen, Tiancheng and Buzcu, Berk and Han, Song and Delgado, Pamela and Klimovic, Ana},
+     title = {Sailor: Automating Distributed Training over Dynamic, Heterogeneous, and Geo-distributed Clusters},
+     year = {2025},
+     isbn = {9798400718700},
+     publisher = {Association for Computing Machinery},
+     address = {New York, NY, USA},
+     url = {https://doi.org/10.1145/3731569.3764839},
+     doi = {10.1145/3731569.3764839},
+     booktitle = {Proceedings of the ACM SIGOPS 31st Symposium on Operating Systems Principles},
+     pages = {204–220},
+     numpages = {17},
+     keywords = {distributed training},
+     location = {Lotte Hotel World, Seoul, Republic of Korea},
+     series = {SOSP '25}
 }
 ```
