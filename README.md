@@ -33,9 +33,9 @@ The project is structured as follows:
 
 * Software: We use nvcr.io/nvidia/pytorch:24.10-py3 as the base image for our container
 * Hardware: We run experiments in 3 different types of clusters:
-      * the [Alps Clariden](https://docs.cscs.ch/clusters/clariden/#logging-into-clariden) cluster, containing Grace-Hopper GPU nodes.
-      * A cluster from the MIT university containing 8-Titan-RTX, 8-RTX-2080, and 8-RTX-3090.
-      * Google Cloud, where we used A100-40 GPUs, and V100-16 GPUs (with n1-standard VMs)
+     * The [Alps Clariden](https://docs.cscs.ch/clusters/clariden/#logging-into-clariden) cluster, containing Grace-Hopper GPU nodes.
+     * A cluster from the MIT university containing 8-Titan-RTX, 8-RTX-2080, and 8-RTX-3090.
+     * Google Cloud, where we used A100-40 GPUs, and V100-16 GPUs (with n1-standard VMs)
 Our simulator validation and plan generation experiments do not require a GPU
 
 ## Instructions for Artifact evaluation
@@ -47,26 +47,34 @@ Instructions for a simple functional use and reproducing key experiments from th
 
 You can build the SAILOR image with:
 
-* `git clone https://github.com/eth-easl/sailor.git`
-* `cd sailor`
-* `docker buildx build -t <image_name> .`
+```sh
+git clone https://github.com/eth-easl/sailor.git
+cd sailor
+docker buildx build -t <image_name> .
+```
 
-To build an image on the Alps cluster, follow the instructions in []()
+To build an image on the Alps cluster, follow the instructions in [create_image_alps.md](create_image_alps.md)
 
+
+## Citation
 
 If you use Sailor, please cite our paper:
 
 ```bibtex
-@misc{sosp2025sailor,
-      title={Sailor: Automating Distributed Training over Dynamic, Heterogeneous, and Geo-distributed Clusters},
-      author={Foteini Strati and Zhendong Zhang and George Manos and Ixeia Sánchez Périz and Qinghao Hu and Tiancheng Chen and Berk Buzcu and Song Han and Pamela Delgado and Ana Klimovic},
-      booktitle = {},
-      year = {2025},
-      isbn = {},
-      address = {},
-      pages = {},
-      url = {},
-      doi = {},
-      publisher = {Association for Computing Machinery},
+@inproceedings{10.1145/3731569.3764839,
+     author = {Strati, Foteini and Zhang, Zhendong and Manos, George and P\'{e}riz, Ixeia S\'{a}nchez and Hu, Qinghao and Chen, Tiancheng and Buzcu, Berk and Han, Song and Delgado, Pamela and Klimovic, Ana},
+     title = {Sailor: Automating Distributed Training over Dynamic, Heterogeneous, and Geo-distributed Clusters},
+     year = {2025},
+     isbn = {9798400718700},
+     publisher = {Association for Computing Machinery},
+     address = {New York, NY, USA},
+     url = {https://doi.org/10.1145/3731569.3764839},
+     doi = {10.1145/3731569.3764839},
+     booktitle = {Proceedings of the ACM SIGOPS 31st Symposium on Operating Systems Principles},
+     pages = {204–220},
+     numpages = {17},
+     keywords = {distributed training},
+     location = {Lotte Hotel World, Seoul, Republic of Korea},
+     series = {SOSP '25}
 }
 ```
