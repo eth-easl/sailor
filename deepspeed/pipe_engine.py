@@ -129,8 +129,6 @@ class PipelineEngine(DeepSpeedEngine):
             self.writer = open(f"{log_dir}/memory_log_worker_rank_{self.global_rank}", 'w')
 
         assert self.dp_world_size == self.grid.data_parallel_size
-        assert self.train_batch_size() == \
-            self.micro_batch_size * self.micro_batches * self.grid.data_parallel_size
 
         #  Set Stage Inf
         self.num_stages = self.grid.pipe_parallel_size
@@ -1456,6 +1454,7 @@ class PipelineEngine(DeepSpeedEngine):
                     log = f"AFTER {cmd}: TOTAL {total_mb} Bytes, RESERVED {reserved_mb} Bytes, ALLOCATED {allocated_mb} Bytes\n"
                     self.writer.write(log)
                     print(log)
+
                 # end_time = time.time()
                 # duration = end_time - start_time
                 # log = f"CMD {cmd} start {start_time}\n"

@@ -41,6 +41,7 @@ RUN bash install_baselines.sh
 
 COPY deepspeed/pipe_engine.py /usr/local/lib/python3.10/dist-packages/deepspeed/runtime/pipe/engine.py
 COPY deepspeed/engine.py /usr/local/lib/python3.10/dist-packages/deepspeed/runtime/engine.py
+COPY deepspeed/config.py /usr/local/lib/python3.10/dist-packages/deepspeed/runtime/config.py
 COPY deepspeed/__init__.py /usr/local/lib/python3.10/dist-packages/deepspeed/__init__.py
 COPY deepspeed/groups.py /usr/local/lib/python3.10/dist-packages/deepspeed/utils/
 COPY deepspeed/p2p.py /usr/local/lib/python3.10/dist-packages/deepspeed/runtime/pipe/p2p.py

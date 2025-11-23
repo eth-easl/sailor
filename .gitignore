@@ -239,3 +239,9 @@ nsys/*
 # Aceso
 *.pkl
 aceso_logs/
+
+# data
+*.npy
+*.dsc
+*.idx
+*.jsonl

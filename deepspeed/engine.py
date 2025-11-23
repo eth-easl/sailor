@@ -122,28 +122,8 @@ except ImportError:
     # Fail silently so we don't spam logs unnecessarily if user isn't using amp
     APEX_INSTALLED = False
 
-# Temporary solution for finding where to split input on heterogeneous TMP
-# TODO: make it more generic/find a better place to put that
-# The dict is {param_name: dim}, where dim shows the dim used for reconciling TMP.
-# if dim=-1, the whole tensor is copied.
-params_tp_dim_dict = {
-    'word_embeddings.weight': 0,
-    'position_embeddings.weight': -1,
-    'attention.query_key_value.weight': 0,
-    'attention.query_key_value.bias': 0,
-    'attention.dense.weight': 1,
-    'attention.dense.bias': -1,
-    'self_attn_layer_norm.weight': -1,
-    'self_attn_layer_norm.bias': -1,
-    'fc1.weight': 0,
-    'fc1.bias': 0,
-    'fc2.weight': 1,
-    'fc2.bias': -1,
-    'final_layer_norm.weight': -1,
-    'final_layer_norm.bias': -1,
-    'lm_head.weight': 0
-}
-
+# will be populated at _broadcast_model() function
+params_tp_dim_dict = OrderedDict()
 
 def split_half_float_double_sparse(tensors):
     device_type = get_accelerator().device_name()
@@ -166,6 +146,17 @@ def split_half_float_double_sparse(tensors):
         if dense_bucket:
             dense_tensor_buckets.append((dtype, dense_bucket))
     return sparse_tensor_buckets, dense_tensor_buckets
+
+def find_sharding_dim(shapes):
+    sharding_dim = -1
+    dims_size = len(shapes[0])
+    for d in range(dims_size):
+        d_dims = [shape[d] for shape in shapes]
+        d_dims_set = set(d_dims)
+        if len(d_dims_set) > 1:
+            return d
+
+    return sharding_dim
 
 
 class EngineTimers(object):
@@ -1146,10 +1137,27 @@ class DeepSpeedEngine(Module):
 
         dp_group_list = self.seq_data_parallel_group
         idx=0
+
+        # build params_tp_dim_dict
+        for n, p in self.module.named_parameters():
+            params_tp_dim_dict[n] = [-1, list(p.shape)] # put at ordered dict to ensure same ordering when broadcasting shape
+
         for dp_group in dp_group_list:
             group_ranks = torch.distributed.get_process_group_ranks(dp_group)
             group_size = len(group_ranks)
-            tps_of_ranks = [torch.zeros(1,dtype=torch.int32, device=self.device) for _ in range(group_size)]
+            for name, info in params_tp_dim_dict.items():
+                print(name, info)
+                dims_shape = len(info[1])
+                all_shapes = [torch.zeros(dims_shape, dtype=torch.int32, device=self.device) for _ in range(group_size)]
+                my_shape = torch.tensor(info[1], dtype=torch.int32, device=self.device)
+                dist.all_gather(all_shapes, my_shape, group=dp_group)
+                all_shapes = [x.tolist() for x in all_shapes]
+                params_tp_dim_dict[name][0] = find_sharding_dim(all_shapes)
+
+        for dp_group in dp_group_list:
+            group_ranks = torch.distributed.get_process_group_ranks(dp_group)
+            group_size = len(group_ranks)
+            tps_of_ranks = [torch.zeros(1, dtype=torch.int32, device=self.device) for _ in range(group_size)]
             my_tp_tensor = torch.tensor(self.mp_world_size, dtype=torch.int32, device=self.device)
             dist.all_gather(tps_of_ranks, my_tp_tensor, group=dp_group)
 
@@ -1159,14 +1167,15 @@ class DeepSpeedEngine(Module):
             bc_src_tp = max(all_tps)
             bc_src = group_ranks[all_tps.index(bc_src_tp)]
 
+            # broadast
             for n, p in self.module.named_parameters():
                 if torch.is_tensor(p) and is_replicated(p):
                     # Broadcast the model for different parameters
-                    param_name_key = ".".join(x for x in n.split(".")[1:]) # param name is layer.name
+                    param_name_key = n
                     if param_name_key not in params_tp_dim_dict:
                         dim_param = -1
                     else:
-                        dim_param = params_tp_dim_dict[param_name_key]
+                        dim_param = params_tp_dim_dict[param_name_key][0]
                     if dim_param==-1:
                         dist.broadcast(p.data, bc_src, group=dp_group)
                     elif dim_param==0:
@@ -2623,7 +2632,7 @@ class DeepSpeedEngine(Module):
                 if param_name not in params_tp_dim_dict:
                     dim_param = -1
                 else:
-                    dim_param = params_tp_dim_dict[param_name]
+                    dim_param = params_tp_dim_dict[param_name][0]
                 if dim_param==-1:
                     non_expert_grads_group.append(whole_grad)
                 elif dim_param==0:

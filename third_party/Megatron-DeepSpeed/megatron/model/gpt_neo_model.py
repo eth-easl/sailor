@@ -369,7 +369,6 @@ class GPTNeoParallelTransformerLayer(MegatronModule):
 
 class GPTNeoParallelTransformerLayerPipe(GPTNeoParallelTransformerLayer):
     def forward(self, inputs, **kwargs):
-        print(f"AT TRANSFORMER, INPUTS IS {inputs.shape}, type is {inputs.dtype}")
 
         # TODO: from LLAMA, not sure if this would work
         assert torch.is_tensor(inputs) or isinstance(inputs, tuple)
@@ -482,10 +481,6 @@ class GPTNeoEmbedding(MegatronModule):
 class GPTNeoEmbeddingPipe(GPTNeoEmbedding):
 
     def forward(self, inputs, **kwargs):
-
-        print(f"AT EMBEDDING:")
-        for x in inputs:
-            print(x, x.shape, x.dtype)
 
         if not hasattr(self, '_args'):
             self._args = get_args()
@@ -603,12 +598,20 @@ class GPTNeoModelPipe(PipelineModule,MegatronModule):
         else:
             interval = 0
 
-        print(f"checkpoint_activations stuff: {args.checkpoint_activations}, {args.recompute_granularity}, {args.recompute_method}, {interval}")
-
-        from deepspeed.runtime.pipe.topology import PipeModelDataParallelTopology
-        topo = PipeModelDataParallelTopology(num_pp=mpu.get_pipeline_model_parallel_world_size(),
-                                             num_mp=mpu.get_tensor_model_parallel_world_size(),
-                                             num_dp=mpu.get_data_parallel_world_size())
+        from deepspeed.runtime.pipe.topology import PipeModelDataParallelTopology, PipeHeterogeneousTopology
+        if args.distributed_config_file:
+            topo = PipeHeterogeneousTopology(
+                num_pp=mpu.get_pipeline_model_parallel_world_size(),
+                num_mp=mpu.get_tensor_model_parallel_world_size(),
+                num_dp=mpu.get_data_parallel_world_size(),
+                input_file=args.distributed_config_file
+            )
+        else:
+            topo = PipeModelDataParallelTopology(
+                num_pp=mpu.get_pipeline_model_parallel_world_size(),
+                num_mp=mpu.get_tensor_model_parallel_world_size(),
+                num_dp=mpu.get_data_parallel_world_size()
+            )
 
         if layers_per_stage:
             layers_per_stage[-1] += 1 # for the loss

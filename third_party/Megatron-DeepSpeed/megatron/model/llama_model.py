@@ -913,10 +913,20 @@ class LlamaModelPipe(PipelineModule, MegatronModule):
         else:
             interval = 0
 
-        from deepspeed.runtime.pipe.topology import PipeModelDataParallelTopology
-        topo = PipeModelDataParallelTopology(num_pp=mpu.get_pipeline_model_parallel_world_size(),
-                                             num_mp=mpu.get_tensor_model_parallel_world_size(),
-                                             num_dp=mpu.get_data_parallel_world_size())
+        from deepspeed.runtime.pipe.topology import PipeModelDataParallelTopology, PipeHeterogeneousTopology
+        if args.distributed_config_file:
+            topo = PipeHeterogeneousTopology(
+                num_pp=mpu.get_pipeline_model_parallel_world_size(),
+                num_mp=mpu.get_tensor_model_parallel_world_size(),
+                num_dp=mpu.get_data_parallel_world_size(),
+                input_file=args.distributed_config_file
+            )
+        else:
+            topo = PipeModelDataParallelTopology(
+                num_pp=mpu.get_pipeline_model_parallel_world_size(),
+                num_mp=mpu.get_tensor_model_parallel_world_size(),
+                num_dp=mpu.get_data_parallel_world_size()
+            )
 
         if layers_per_stage:
             layers_per_stage[-1] += 1 # for the loss

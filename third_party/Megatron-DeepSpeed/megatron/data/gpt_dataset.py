@@ -485,15 +485,6 @@ def _build_index_mappings(args, name, data_prefix, documents, sizes,
             data_cache_success = False
 
     torch.distributed.barrier(group=mpu.get_tp_rank0_group()) # used to make sure data cache is built
-    # counts = get_accelerator().LongTensor([data_cache_success])
-    # torch.distributed.all_reduce(counts, group=mpu.get_data_parallel_group())
-    # torch.distributed.all_reduce(counts, group=mpu.get_pipeline_model_parallel_group())
-    # if counts[0].item() != (
-    #     torch.distributed.get_world_size() //
-    #     torch.distributed.get_world_size(group=mpu.get_tensor_model_parallel_group()) //
-    #     torch.distributed.get_world_size(group=mpu.get_sequence_parallel_group())):
-    #     print_rank_0("Data index creation unsuccessful, exiting.")
-    #     exit()
 
     # Load mappings.
     start_time = time.time()
