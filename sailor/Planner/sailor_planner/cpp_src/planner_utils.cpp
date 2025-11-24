@@ -204,6 +204,7 @@ double find_ar_time(
 
     int gpu_idx;
     int tp = 1;
+    int min_tmp = 4;
 
     // printf("Inside find_ar_time, dp size is %d\n", dp);
     double ar_part = tensor_size / dp;
@@ -216,6 +217,7 @@ double find_ar_time(
         int tpi = tp_degrees[i].first;
         if (tpi == 0)
             continue;
+        min_tmp = min(min_tmp, tpi);
         string sender_zone = id_to_zone[tp_degrees[i].second];
 
         for (auto receiver_zone = zones.begin(); receiver_zone != zones.end(); receiver_zone++)
@@ -232,13 +234,11 @@ double find_ar_time(
             }
         }
     }
-    // cout << "Check for bottleneck for gpu_type " << gpu_idx << ", and tp: " << tp << endl;
-    // if (ar_times_bottleneck.find(gpu_type) != ar_times_bottleneck.end()) {
-    //     printf("GPU found!\n");
-    //     printf("TP vector size is %d\n", ar_times_bottleneck[gpu_type].size());
-    // }
 
-    return ar_times_bottleneck[make_pair(min_szone, min_rzone)][gpu_idx][tp][dp][stage_key];
+
+    auto x =  ar_times_bottleneck[make_pair(min_szone, min_rzone)][gpu_idx][min_tmp][dp][stage_key];
+    //cout << "x is: " << x << endl;
+    return x;
 }
 
 pair<double, double> merge_stages_get_time(
